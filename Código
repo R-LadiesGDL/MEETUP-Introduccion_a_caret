@@ -1,0 +1,100 @@
+#Para la sesión es necesario descargar e instalar las paqueterías de:
+install.packages("caret", "tidyverse", "titanic")
+
+####### tydiverse#######
+#
+
+#Instalación de librerías
+library(tidyverse)
+library(titanic)
+datos <- titanic_train
+
+#resumen de datos
+glimpse(datos)
+
+#convertir a factores
+datos$Survived <- if_else(datos$Survived == 1, "Si", "No")
+datos$Survived <- as.factor(datos$Survived)
+datos
+
+datos$SibSp <- as.factor(datos$SibSp)
+datos$Parch <- as.factor(datos$Parch)
+
+
+#graficar para poder predecir
+ggplot(data = datos, aes(x = Survived, y = ..count.., fill = Survived)) +
+  geom_bar() +
+  scale_fill_manual(values = c("gray50", "orangered2")) +
+  labs(title = "Supervivencia") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+#tabla de frecuencias 
+table(datos$Survived)
+#porcentaje 
+  prop.table(table(datos$Survived)) %>% round(digits = 2)
+  
+# Porcentaje de aciertos si se predice para todas las observaciones que no sobrevivieron.
+n_observaciones <- nrow(datos)
+predicciones <- rep(x = "No",  n_observaciones)
+mean(predicciones == datos$Survived) * 100
+
+#distribuci?n seg?n la clase a la que pertenec?an 
+ggplot(data = datos, aes(x = Pclass, y = ..count.., fill = Survived)) +
+  geom_bar() +
+  scale_fill_manual(values = c("gray50", "orangered2")) +
+  labs(title = "Pclass") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+#tabla frecuencias
+prop.table(table(datos$Pclass, datos$Survived), margin = 1) %>% round(digits = 2)
+
+
+#distribuci?n por sexo
+
+ggplot(data = datos, aes(x = Sex, y = ..count.., fill = Survived)) +
+  geom_bar() +
+  labs(title = "Sex") +
+  scale_fill_manual(values = c("gray50", "orangered2")) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+datos_train <- datos_train %>%
+  mutate(Embarked = replace(Embarked, is.na(Embarked), "C"))
+datos_test <-  datos_test %>%
+  mutate(Embarked = replace(Embarked, is.na(Embarked), "C"))
+
+
+
+#####caret####
+#dividir de entrenamiento y test
+set.seed(123)
+# Se crean los ?ndices de las observaciones de entrenamiento
+train <- createDataPartition(y = datos$Survived, p = 0.8, list = FALSE, times = 1)
+datos_train <- datos[train, ]
+datos_test  <- datos[-train, ]
+#verificar distribuci?n
+#gracias a creatDatapartition, se garantiza la distribuci?n
+prop.table(table(datos_train$Survived))
+prop.table(table(datos_test$Survived))
+
+
+#preprocesamiento de datos 
+#eliminar datos
+#step_bagimpute(): Bagged Trees.
+#step_knnimpute(): K-Nearest Neighbors.
+#step_meanimpute(): media del predictor (predictores continuos).
+#step_modeimpute():v?a moda del predictor (predictores cualitativos).
+
+
+nrow(datos)
+nrow(na.omit(datos))
+
+#eliminar variable Embarked con valor C
+datos_train <- datos_train %>%
+  mutate(Embarked = replace(Embarked, is.na(Embarked), "C"))
+datos_test <-  datos_test %>%
+  mutate(Embarked = replace(Embarked, is.na(Embarked), "C"))
+
+
