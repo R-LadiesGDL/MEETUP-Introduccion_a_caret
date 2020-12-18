@@ -1,5 +1,5 @@
 #Para la sesión es necesario descargar e instalar las paqueterías de:
-install.packages("caret", "tidyverse", "titanic")
+install.packages("caret", "tidyverse", "titanic", "lattice")
 
 ####### tydiverse#######
 #
